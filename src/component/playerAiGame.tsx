@@ -17,10 +17,10 @@ interface PythonAI {
 }
 
 function PlayerAiGame() {
-    
+
     // 初始化 AI
     const [aiMapForPython, setAiMapForPython] = useState([] as PythonAI[])
-    
+
     // 加载 python 的 AI
     useEffect(() => {
         GET(pythonAiListUrl, (data) => {
@@ -59,6 +59,10 @@ function PlayerAiGame() {
             if (!prompt) {
                 return
             }
+            if (currentPiece === playerPiece) {
+                setIsAiRunning(false)
+                return
+            }
             // 无棋可下, 直接跳过
             if (prompt.list.length === 0) {
                 setCurrentPiece((currentPiece) => currentPiece === 1 ? 2 : 1)
@@ -77,7 +81,7 @@ function PlayerAiGame() {
             // 判断是 js 还是 python, 使用不同的策略
             if (aiIndex < 0) {
                 // 对 JS 的 AI
-                aiMapForJs[-aiIndex-1].fn(board, currentPiece, newest, reversal, prompt, (_newest) => {
+                aiMapForJs[-aiIndex - 1].fn(board, currentPiece, newest, reversal, prompt, (_newest) => {
                     if (prompt) {
                         updateBoard(_newest, prompt[_newest.toString()])
                         setIsAiRunning(false)
@@ -225,7 +229,7 @@ function PlayerAiGame() {
                     <Radio.Button value={0} onClick={() => setDelay(0)} style={{ minWidth: 96 }}>无延时</Radio.Button>
                 </Radio.Group>
                 <Select defaultValue={-1} value={aiIndex} size="large" style={{ width: 120 }} onChange={(value) => setAiIndex(value)}>
-                    {aiMapForJs.map((ai, index) => <Option value={-index-1} key={-index-1}>{ai.name}</Option>)}
+                    {aiMapForJs.map((ai, index) => <Option value={-index - 1} key={-index - 1}>{ai.name}</Option>)}
                     {aiMapForPython.map((ai, index) => <Option value={index} key={index}>{ai.name}</Option>)}
                 </Select>
                 <Button onClick={downloadData} size="large" style={{ minWidth: 80 }}>
@@ -251,7 +255,7 @@ function PlayerAiGame() {
             <br />
             <br />
             <Paragraph>
-                {aiIndex < 0 ? aiMapForJs[-aiIndex-1].description : aiMapForPython[aiIndex].description}
+                {aiIndex < 0 ? aiMapForJs[-aiIndex - 1].description : aiMapForPython[aiIndex].description}
             </Paragraph>
             <Board board={board} current={currentPiece} reversal={reversal} newest={newest}
                 isEnd={endCount >= 2}
